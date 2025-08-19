@@ -1,10 +1,10 @@
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/Assets/StreamingAssets/
-/Assets/Plugins/Editor/JetBrains/Editor/JetBrains/
+AdvantClickerTT/[Ll]ibrary/
+AdvantClickerTT/[Tt]emp/
+AdvantClickerTT/[Oo]bj/
+AdvantClickerTT/[Bb]uild/
+AdvantClickerTT/[Bb]uilds/
+AdvantClickerTT/Assets/StreamingAssets/
+AdvantClickerTT/Assets/Plugins/Editor/JetBrains/Editor/JetBrains/
 
 *.log
 crashlytics-build.properties
