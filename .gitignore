@@ -3,10 +3,9 @@ AdvantClickerTT/[Tt]emp/
 AdvantClickerTT/[Oo]bj/
 AdvantClickerTT/[Bb]uild/
 AdvantClickerTT/[Bb]uilds/
-AdvantClickerTT/Assets/StreamingAssets/
-AdvantClickerTT/Assets/Plugins/Editor/JetBrains/Editor/JetBrains/
+AdvantClickerTT/UserSettings
+AdvantClickerTT/.idea/
 
 *.log
-crashlytics-build.properties
 
 .DS_Store
