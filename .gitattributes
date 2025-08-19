@@ -1,0 +1,10 @@
+* text=auto
+
+*.yaml text eol=lf
+*.yml text eol=lf
+*.asset text eol=lf
+*.prefab text eol=lf
+*.mat text eol=lf
+*.shader text eol=lf
+
+*.cs text eol=crlf
