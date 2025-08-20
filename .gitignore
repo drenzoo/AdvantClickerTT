@@ -7,5 +7,6 @@ AdvantClickerTT/UserSettings
 AdvantClickerTT/.idea/
 
 *.log
+*.csproj
 
 .DS_Store

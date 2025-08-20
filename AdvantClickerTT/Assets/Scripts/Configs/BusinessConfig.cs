@@ -4,9 +4,9 @@ using UnityEngine;
 public sealed class BusinessConfig
 {
     [SerializeField] private int _id;
+    [SerializeField] private float _delaySeconds;
     [SerializeField] private long _baseCost;
     [SerializeField] private long _baseIncome;
-    [SerializeField] private float _delaySeconds;
     [SerializeField] private BusinessUpgradeConfig _upgrade1;
     [SerializeField] private BusinessUpgradeConfig _upgrade2;
 

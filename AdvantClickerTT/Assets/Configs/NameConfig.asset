@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce7056eba57b86541b096c9adb43efcf, type: 3}
+  m_Name: NameConfig
+  m_EditorClassIdentifier: 
+  _businesses:
+  - _businessId: 0
+    _title: Businesses #1 Basic
+  - _businessId: 1
+    _title: Businesses #2 Standard
+  - _businessId: 2
+    _title: Businesses #3 Advanced
+  - _businessId: 3
+    _title: Businesses #4 Expert
+  - _businessId: 4
+    _title: Businesses #5 Ultimate
+  _upgrades:
+  - _businessId: 0
+    _upgradeIndex: 0
+    _title: Automated Production
+  - _businessId: 0
+    _upgradeIndex: 1
+    _title: Streamlined Process
+  - _businessId: 1
+    _upgradeIndex: 0
+    _title: Bulk Order Discount
+  - _businessId: 1
+    _upgradeIndex: 1
+    _title: Quality Control
+  - _businessId: 2
+    _upgradeIndex: 0
+    _title: Franchise Model
+  - _businessId: 2
+    _upgradeIndex: 1
+    _title: Overtime Shift
+  - _businessId: 3
+    _upgradeIndex: 0
+    _title: Prime Location
+  - _businessId: 3
+    _upgradeIndex: 1
+    _title: Brand Loyalty
+  - _businessId: 4
+    _upgradeIndex: 0
+    _title: Energy Upgrade
+  - _businessId: 4
+    _upgradeIndex: 1
+    _title: Global Monopoly
