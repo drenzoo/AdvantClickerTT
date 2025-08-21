@@ -47,10 +47,10 @@ public sealed class MainScreenUISystem : IEcsInitSystem, IEcsRunSystem, IEcsDest
 
         ref var currency = ref _currencyPool.Get(currencyEntity);
 
-        foreach (var e in _mainViewFilter)
+        foreach (var entity in _mainViewFilter)
         {
-            ref var mainScreenViewReferenceComponent = ref _mainScreenViewPool.Get(e);
-            mainScreenViewReferenceComponent.MainScreenViewReference.HeaderText.text = _moneyFormatter.Format(currency.CurrentBalance); // <-- Error nullref
+            ref var mainScreenViewReferenceComponent = ref _mainScreenViewPool.Get(entity);
+            mainScreenViewReferenceComponent.MainScreenViewReference.HeaderText.text = $"Balance: {_moneyFormatter.Format(currency.CurrentBalance)}$";
         }
     }
 

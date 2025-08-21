@@ -1,3 +1,4 @@
+using System;
 using Leopotam.EcsLite;
 using UnityEngine;
 
@@ -11,12 +12,14 @@ public sealed class EcsStartup : MonoBehaviour
     private EcsWorld _world;
 
     private IEcsSystems _systems;
-    //private ISaveService _saveService;
+    private ISaveService _saveService;
     private MoneyFormatter _moneyFormatter;
+    
+    private int _systemEntity;
 
     private void Awake()
     {
-        //_saveService = new JsonSaveService();
+        _saveService = new PlayerPrefsSaveService();
         _moneyFormatter = new MoneyFormatter();
         
         _world = new EcsWorld();
@@ -36,9 +39,22 @@ public sealed class EcsStartup : MonoBehaviour
                 
                 .Add(new EcsOneFrame<BusinessLevelUpEventComponent>())
                 .Add(new EcsOneFrame<BusinessUpgradeEventComponent>())
+                .Add(new EcsOneFrame<UpdateBusinessUIEventComponent>())
             ;
         
         _systems.Init();
+        _systemEntity = _world.NewEntity();
+        
+        if (_saveService.TryLoad(_world))
+        {
+            RequestBusinessUIUpdate();
+        }
+    }
+
+    private void RequestBusinessUIUpdate()
+    {
+        var businessUpgradeRequestPool = _world.GetPool<UpdateBusinessUIEventComponent>();
+        businessUpgradeRequestPool.Add(_systemEntity);
     }
 
     private void Update()
@@ -48,7 +64,15 @@ public sealed class EcsStartup : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        // _saveService.Save(_world);
+        _saveService?.Save(_world);
+    }
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (!hasFocus)
+        {
+            _saveService?.Save(_world);
+        }
     }
 
     private void OnDestroy()

@@ -16,17 +16,14 @@ public sealed class ProgressTickSystem : IEcsRunSystem
             break;
         }
 
-        var activeFilter = world.Filter<BusinessConfigReferenceComponent>()
-            .Inc<BusinessLevelComponent>()
-            .Inc<IncomeCycleComponent>()
-            .End();
+        var activeFilter = world.Filter<BusinessConfigReferenceComponent>().Inc<BusinessLevelComponent>().Inc<IncomeCycleComponent>().End();
 
         var businessLevelPool = world.GetPool<BusinessLevelComponent>();
         var businessConfigReferencePool = world.GetPool<BusinessConfigReferenceComponent>();
         var incomeCyclePool = world.GetPool<IncomeCycleComponent>();
         var playerCurrencyPool = world.GetPool<PlayerCurrencyComponent>();
         var businessUpgradesPool = world.GetPool<BusinessUpgradesComponent>();
-        
+
         var balanceEntity = -1;
         var balanceFilter = world.Filter<PlayerCurrencyComponent>().End();
         foreach (var be in balanceFilter)
@@ -42,16 +39,18 @@ public sealed class ProgressTickSystem : IEcsRunSystem
             ref var businessLevelComponent = ref businessLevelPool.Get(entity);
             ref var businessConfigReferenceComponent = ref businessConfigReferencePool.Get(entity);
             ref var businessUpgradesComponent = ref businessUpgradesPool.Get(entity);
-            
+
             if (businessLevelComponent.Level == 0)
             {
-                // UnityEngine.Debug.Log($"Skip: #{businessConfigReferenceComponent.BusinessId}");
+//#if UNITY_EDITOR
+//                UnityEngine.Debug.Log($"Skip: #{businessConfigReferenceComponent.BusinessId}");
+//#endif
                 continue;
             }
-            
+
             ref var incomeCycleComponent = ref incomeCyclePool.Get(entity);
             var delay = businessConfigReferenceComponent.BaseDelaySeconds;
-            
+
             incomeCycleComponent.FullCycleTime = delay;
 
             if (currentTime < incomeCycleComponent.NextIncomeTime)
@@ -65,8 +64,10 @@ public sealed class ProgressTickSystem : IEcsRunSystem
             var incomePerCycle = businessLevelComponent.Level * businessConfigReferenceComponent.BaseIncome * (decimal)businessUpgradesComponent.Multiplier;
             var income = incomePerCycle * cyclesCompleted;
 
-            UnityEngine.Debug.LogError($"{playerCurrencyComponent.CurrentBalance} + {income}");
-            
+#if UNITY_EDITOR
+            UnityEngine.Debug.Log($"{playerCurrencyComponent.CurrentBalance} + {income}");
+#endif
+
             playerCurrencyComponent.CurrentBalance += income;
 
             var shift = cyclesCompleted * delay;

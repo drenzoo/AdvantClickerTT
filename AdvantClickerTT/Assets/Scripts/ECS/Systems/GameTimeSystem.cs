@@ -24,7 +24,7 @@ public sealed class GameTimeSystem : IEcsInitSystem, IEcsRunSystem
         {
             ref var gameTime = ref _timePool.Get(entity);
 
-            gameTime.CurrentTime = UnityEngine.Time.time;
+            gameTime.CurrentTime += UnityEngine.Time.deltaTime;
         }
     }
 }

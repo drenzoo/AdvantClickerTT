@@ -1,1 +1,3 @@
-public struct BusinessLevelUpEventComponent {}
+public struct BusinessLevelUpEventComponent
+{
+}

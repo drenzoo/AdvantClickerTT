@@ -72,6 +72,7 @@ public sealed class BusinessesUpgradeSystem : IEcsInitSystem, IEcsRunSystem
 
         ref var currency = ref _playerCurrencyPool.Get(currencyEntity);
         var gameConfig = _configReferencePool.Get(configEntity).GameConfig;
+        var nameConfig = _configReferencePool.Get(configEntity).NameConfig;
 
         foreach (var entity in _requestedFilter)
         {
@@ -87,17 +88,19 @@ public sealed class BusinessesUpgradeSystem : IEcsInitSystem, IEcsRunSystem
                 UnityEngine.Debug.LogError($"An attempt to upgrade when currency < price!");
                 continue;
             }
-            
-            UnityEngine.Debug.LogError($"TEST DONE");
 
             currency.CurrentBalance -= price;
-            businessUpgradesComponent.Multiplier += gameConfig.Businesses[businessConfigReferenceComponent.BusinessId].BusinessUpgradeConfig[businessUpgradeComponent.UpgradeIndex].Multiplier;
+            var additionalMultiplier = gameConfig.Businesses[businessConfigReferenceComponent.BusinessId].BusinessUpgradeConfig[businessUpgradeComponent.UpgradeIndex].Multiplier;
+            businessUpgradesComponent.Multiplier += additionalMultiplier;
             businessUpgradesComponent.AddUpgrade(businessUpgradeComponent.UpgradeIndex);
 
             foreach (var upgradeButtonEntity in _upgradeButtonsFilter)
             {
                 var ownerEntity = _ownerPool.Get(upgradeButtonEntity).Entity;
-                if (ownerEntity != entity) continue;
+                if (ownerEntity != entity)
+                {
+                    continue;
+                }
 
                 ref var businessUpgradeButtonViewReferenceComponent = ref _businessUpgradeButtonViewReferencePool.Get(upgradeButtonEntity);
                 var businessUpgradeButtonDataComponent = _businessUpgradeButtonDataPool.Get(upgradeButtonEntity);
@@ -108,7 +111,9 @@ public sealed class BusinessesUpgradeSystem : IEcsInitSystem, IEcsRunSystem
                 }
 
                 businessUpgradeButtonViewReferenceComponent.View.UpgradeButton.interactable = false;
-                businessUpgradeButtonViewReferenceComponent.View.ButtonText.text = "Purchased!";
+                businessUpgradeButtonViewReferenceComponent.View.ButtonText.text = $"{nameConfig.GetUpgradeName(businessConfigReferenceComponent.BusinessId, businessUpgradeComponent.UpgradeIndex)}\n" +
+                                                                                   $"Income +{additionalMultiplier * 100f}%\n" +
+                                                                                   $"Purchased!";
                 break;
             }
 

@@ -14,9 +14,9 @@ public sealed class EcsOneFrame<T> : IEcsInitSystem, IEcsRunSystem where T : str
 
     public void Run(IEcsSystems systems)
     {
-        foreach (var e in _filter)
+        foreach (var entity in _filter)
         {
-            _pool.Del(e);
+            _pool.Del(entity);
         }
     }
 }
