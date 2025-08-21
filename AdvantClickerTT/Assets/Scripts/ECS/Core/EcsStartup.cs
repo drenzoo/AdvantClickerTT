@@ -31,7 +31,8 @@ public sealed class EcsStartup : MonoBehaviour
                 .Add(new MainScreenUISystem(_uiResourcesConfig, _uiRoot, _moneyFormatter))
                 .Add(new BusinessesUISystem(_uiResourcesConfig, _moneyFormatter))
                 
-                .Add(new ProcessBusinessLevelUpSystem())
+                .Add(new ProcessBusinessLevelUpSystem(_moneyFormatter))
+                .Add(new BusinessesUpgradeSystem(_moneyFormatter))
                 
                 .Add(new EcsOneFrame<BusinessLevelUpEventComponent>())
                 .Add(new EcsOneFrame<BusinessUpgradeEventComponent>())

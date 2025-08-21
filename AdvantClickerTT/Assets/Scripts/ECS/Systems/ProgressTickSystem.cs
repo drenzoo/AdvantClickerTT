@@ -6,13 +6,13 @@ public sealed class ProgressTickSystem : IEcsRunSystem
     public void Run(IEcsSystems systems)
     {
         var world = systems.GetWorld();
-        var timeFilter = world.Filter<GameTimeComponent>().End();
-        var timePool = world.GetPool<GameTimeComponent>();
+        var gameTimeFiler = world.Filter<GameTimeComponent>().End();
+        var gameTimePool = world.GetPool<GameTimeComponent>();
 
         double currentTime = 0;
-        foreach (var t in timeFilter)
+        foreach (var t in gameTimeFiler)
         {
-            currentTime = timePool.Get(t).CurrentTime;
+            currentTime = gameTimePool.Get(t).CurrentTime;
             break;
         }
 
@@ -21,11 +21,12 @@ public sealed class ProgressTickSystem : IEcsRunSystem
             .Inc<IncomeCycleComponent>()
             .End();
 
-        var levelPool = world.GetPool<BusinessLevelComponent>();
-        var configPool = world.GetPool<BusinessConfigReferenceComponent>();
-        var cyclePool = world.GetPool<IncomeCycleComponent>();
-
-        var balancePool = world.GetPool<PlayerCurrencyComponent>();
+        var businessLevelPool = world.GetPool<BusinessLevelComponent>();
+        var businessConfigReferencePool = world.GetPool<BusinessConfigReferenceComponent>();
+        var incomeCyclePool = world.GetPool<IncomeCycleComponent>();
+        var playerCurrencyPool = world.GetPool<PlayerCurrencyComponent>();
+        var businessUpgradesPool = world.GetPool<BusinessUpgradesComponent>();
+        
         var balanceEntity = -1;
         var balanceFilter = world.Filter<PlayerCurrencyComponent>().End();
         foreach (var be in balanceFilter)
@@ -34,43 +35,43 @@ public sealed class ProgressTickSystem : IEcsRunSystem
             break;
         }
 
-        ref var balance = ref balancePool.Get(balanceEntity);
+        ref var playerCurrencyComponent = ref playerCurrencyPool.Get(balanceEntity);
 
-        foreach (var e in activeFilter)
+        foreach (var entity in activeFilter)
         {
-            ref var level = ref levelPool.Get(e);
-            ref var config = ref configPool.Get(e);
+            ref var businessLevelComponent = ref businessLevelPool.Get(entity);
+            ref var businessConfigReferenceComponent = ref businessConfigReferencePool.Get(entity);
+            ref var businessUpgradesComponent = ref businessUpgradesPool.Get(entity);
             
-            if (level.Level == 0)
+            if (businessLevelComponent.Level == 0)
             {
-                UnityEngine.Debug.Log($"Skip: #{config.BusinessId}");
+                // UnityEngine.Debug.Log($"Skip: #{businessConfigReferenceComponent.BusinessId}");
                 continue;
             }
             
-            ref var cycle = ref cyclePool.Get(e);
+            ref var incomeCycleComponent = ref incomeCyclePool.Get(entity);
+            var delay = businessConfigReferenceComponent.BaseDelaySeconds;
+            
+            incomeCycleComponent.FullCycleTime = delay;
 
-            var delay = config.BaseDelaySeconds;
-            cycle.FullCycleTime = delay;
-
-            if (currentTime < cycle.NextIncomeTime)
+            if (currentTime < incomeCycleComponent.NextIncomeTime)
             {
                 continue;
             }
 
-            var overtime = currentTime - cycle.NextIncomeTime;
+            var overtime = currentTime - incomeCycleComponent.NextIncomeTime;
             var cyclesCompleted = 1 + (int)Math.Floor(overtime / delay);
 
-            // ref var upgradesImpact = ref pool.Get(e);
-            var incomePerCycle = level.Level * config.BaseIncome;// * upgradesImpact.IncomeMultiplier;
-            var income = Math.Floor(incomePerCycle) * cyclesCompleted;
+            var incomePerCycle = businessLevelComponent.Level * businessConfigReferenceComponent.BaseIncome * (decimal)businessUpgradesComponent.Multiplier;
+            var income = incomePerCycle * cyclesCompleted;
 
-            balance.CurrentBalance += income;
+            UnityEngine.Debug.LogError($"{playerCurrencyComponent.CurrentBalance} + {income}");
             
-            UnityEngine.Debug.LogError($"{balance.CurrentBalance}");
+            playerCurrencyComponent.CurrentBalance += income;
 
             var shift = cyclesCompleted * delay;
-            cycle.CycleStartTime += shift;
-            cycle.NextIncomeTime += shift;
+            incomeCycleComponent.CycleStartTime += shift;
+            incomeCycleComponent.NextIncomeTime += shift;
         }
     }
 }

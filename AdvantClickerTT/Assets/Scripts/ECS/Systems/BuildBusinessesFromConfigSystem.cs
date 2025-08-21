@@ -15,9 +15,9 @@ public sealed class BuildBusinessesFromConfigSystem : IEcsInitSystem
         var gameTimePool = world.GetPool<GameTimeComponent>();
         
         var configEntity = -1;
-        foreach (var e in configReferenceFilter)
+        foreach (var entity in configReferenceFilter)
         {
-            configEntity = e;
+            configEntity = entity;
             break;
         }
 
@@ -35,8 +35,7 @@ public sealed class BuildBusinessesFromConfigSystem : IEcsInitSystem
         var businessConfigReferencePool = world.GetPool<BusinessConfigReferenceComponent>();
         var businessLevelPool = world.GetPool<BusinessLevelComponent>();
         var incomeCyclePool = world.GetPool<IncomeCycleComponent>();
-        //var upMaskPool = world.GetPool<UpgradesMask>();
-        //var upEffectPool = world.GetPool<UpgradesEffectCache>();
+        var businessUpgradesPool = world.GetPool<BusinessUpgradesComponent>();
         
         foreach (var businessConfig in gameConfig.Businesses)
         {
@@ -45,6 +44,7 @@ public sealed class BuildBusinessesFromConfigSystem : IEcsInitSystem
             ref var businessConfigReferenceComponent = ref businessConfigReferencePool.Add(entity);
             ref var levelComponent = ref businessLevelPool.Add(entity);
             ref var incomeCycleComponent = ref incomeCyclePool.Add(entity);
+            ref var businessUpgradesComponent = ref businessUpgradesPool.Add(entity);
             
             businessConfigReferenceComponent.BusinessId = businessConfig.Id;
             businessConfigReferenceComponent.BaseCost = businessConfig.BaseCost;
@@ -57,8 +57,8 @@ public sealed class BuildBusinessesFromConfigSystem : IEcsInitSystem
             incomeCycleComponent.CycleStartTime = currentTime;
             incomeCycleComponent.NextIncomeTime = currentTime + businessConfigReferenceComponent.BaseDelaySeconds;
 
-            // ref var mask = ref upMaskPool.Add(e);
-            // mask.Bits = 0;
+            businessUpgradesComponent.UpgradesMask = 0;
+            businessUpgradesComponent.Multiplier = 1;
         }
     }
 }

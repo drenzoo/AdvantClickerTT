@@ -14,11 +14,14 @@ public sealed class BusinessesUISystem : IEcsInitSystem, IEcsRunSystem, IEcsDest
     private EcsPool<BusinessUpgradeEventComponent> _businessUpgradeRequestPool;
     private EcsPool<BusinessLevelUpEventComponent> _businessLevelUpRequestPool;
     private EcsPool<BusinessUpgradeButtonViewReferenceComponent> _businessUpgradeButtonViewReferencePool;
+    private EcsPool<BusinessUpgradeButtonDataComponent> _businessUpgradeButtonDataPool;
     private EcsPool<IncomeCycleComponent> _incomeCyclePool;
     private EcsPool<BusinessLevelComponent> _businessLevelPool;
     private EcsPool<GameTimeComponent> _gameTimePool;
     private EcsPool<PlayerCurrencyComponent> _playerCurrencyPool;
     private EcsPool<ConfigReferenceComponent> _configReferencePool;
+    private EcsPool<OwnerComponent> _ownerPool;
+    private EcsPool<BusinessUpgradesComponent> _businessUpgradesPool;
 
     private EcsFilter _mainScreenViewReferenceFilter;
     private EcsFilter _businessConfigReferenceFilter;
@@ -44,6 +47,9 @@ public sealed class BusinessesUISystem : IEcsInitSystem, IEcsRunSystem, IEcsDest
         _businessLevelUpRequestPool = _world.GetPool<BusinessLevelUpEventComponent>();
         _businessUpgradeRequestPool = _world.GetPool<BusinessUpgradeEventComponent>();
         _businessUpgradeButtonViewReferencePool = _world.GetPool<BusinessUpgradeButtonViewReferenceComponent>();
+        _businessUpgradeButtonDataPool = _world.GetPool<BusinessUpgradeButtonDataComponent>();
+        _businessUpgradesPool = _world.GetPool<BusinessUpgradesComponent>();
+        _ownerPool = _world.GetPool<OwnerComponent>();
         _incomeCyclePool = _world.GetPool<IncomeCycleComponent>();
         _businessLevelPool = _world.GetPool<BusinessLevelComponent>();
         _gameTimePool = _world.GetPool<GameTimeComponent>();
@@ -81,17 +87,20 @@ public sealed class BusinessesUISystem : IEcsInitSystem, IEcsRunSystem, IEcsDest
 
         foreach (var businessEntity in _businessConfigReferenceFilter)
         {
-            var businessConfigReference = _businessConfigReferencePool.Get(businessEntity);
+            var businessConfigReferenceComponent = _businessConfigReferencePool.Get(businessEntity);
             var businessLevel = _businessLevelPool.Get(businessEntity).Level;
+            ref var businessUpgradesComponent = ref _businessUpgradesPool.Get(businessEntity);
 
             var businessView = Object.Instantiate(_uiResourcesConfig.BusinessViewPrefab, businessLayer);
             ref var businessViewReferenceComponent = ref _businessViewReferencePool.Add(businessEntity);
+            
             businessViewReferenceComponent.View = businessView;
-
-            businessView.HeaderText.text = nameConfig.GetBusinessName(businessConfigReference.BusinessId);
+            
+            businessView.Slider.value = 0;
+            businessView.HeaderText.text = nameConfig.GetBusinessName(businessConfigReferenceComponent.BusinessId);
             businessView.LevelText.text = $"Lvl: {businessLevel}";
-            businessView.ButtonText.text = $"Level up\nPrice: {businessConfigReference.BaseCost * (businessLevel + 1)}";
-            businessView.IncomeText.text = $"Income: {_moneyFormatter.Format(businessConfigReference.BaseIncome * businessLevel)}$";
+            businessView.ButtonText.text = $"Level up\nPrice: {businessConfigReferenceComponent.BaseCost * (businessLevel + 1)}";
+            businessView.IncomeText.text = $"Income: {_moneyFormatter.Format(businessConfigReferenceComponent.BaseIncome * businessLevel * (decimal)businessUpgradesComponent.Multiplier)}$";
 
             businessView.LevelUpButton.onClick.AddListener(() =>
             {
@@ -101,17 +110,21 @@ public sealed class BusinessesUISystem : IEcsInitSystem, IEcsRunSystem, IEcsDest
                 }
             });
 
-            var businessUpgradeConfig = gameConfig.Businesses[businessConfigReference.BusinessId].BusinessUpgradeConfig;
+            var businessUpgradeConfig = gameConfig.Businesses[businessConfigReferenceComponent.BusinessId].BusinessUpgradeConfig;
             for (var upgradeIndex = 0; upgradeIndex < businessUpgradeConfig.Length; upgradeIndex++)
             {
                 var upgradeButtonViewReference = Object.Instantiate(_uiResourcesConfig.UpgradeButtonViewPrefab, businessView.UnlocksLayer);
-                upgradeButtonViewReference.ButtonText.text = nameConfig.GetUpgradeName(businessConfigReference.BusinessId, upgradeIndex);
+                upgradeButtonViewReference.ButtonText.text = nameConfig.GetUpgradeName(businessConfigReferenceComponent.BusinessId, upgradeIndex);
 
-                var btnEntity = _world.NewEntity();
-                ref var businessUpgradeButtonViewReference = ref _businessUpgradeButtonViewReferencePool.Add(btnEntity);
-                businessUpgradeButtonViewReference.View = upgradeButtonViewReference;
-                businessUpgradeButtonViewReference.UpgradeIndex = upgradeIndex;
-                businessUpgradeButtonViewReference.Price = businessUpgradeConfig[upgradeIndex].Price;
+                var upgradeEntity = _world.NewEntity();
+                ref var businessUpgradeButtonViewReferenceComponent = ref _businessUpgradeButtonViewReferencePool.Add(upgradeEntity);
+                ref var businessUpgradeButtonDataComponent = ref _businessUpgradeButtonDataPool.Add(upgradeEntity);
+                ref var ownerComponent = ref _ownerPool.Add(upgradeEntity);
+
+                ownerComponent.Entity = businessEntity;
+                businessUpgradeButtonViewReferenceComponent.View = upgradeButtonViewReference;
+                businessUpgradeButtonDataComponent.Price = businessUpgradeConfig[upgradeIndex].Price;
+                businessUpgradeButtonDataComponent.UpgradeIndex = upgradeIndex;
 
                 var capturedIndex = upgradeIndex;
                 upgradeButtonViewReference.UpgradeButton.onClick.AddListener(() =>
@@ -149,10 +162,19 @@ public sealed class BusinessesUISystem : IEcsInitSystem, IEcsRunSystem, IEcsDest
             var businessConfigReference = _businessConfigReferencePool.Get(entity);
             var businessLevel = _businessLevelPool.Get(entity).Level;
             ref var businessViewReferenceComponent = ref _businessViewReferencePool.Get(entity);
+            
+            businessViewReferenceComponent.View.LevelUpButton.interactable = currency.CurrentBalance >= (businessConfigReference.BaseCost * (businessLevel + 1));
+            
+            if (businessLevel < 1)
+            {
+                continue;
+            }
+            
             ref var incomeCycleComponent = ref _incomeCyclePool.Get(entity);
 
             var remaining = incomeCycleComponent.NextIncomeTime - currentTime;
             var progress = 1f - (remaining / incomeCycleComponent.FullCycleTime);
+            
             if (progress < 0f)
             {
                 progress = 0f;
@@ -163,13 +185,22 @@ public sealed class BusinessesUISystem : IEcsInitSystem, IEcsRunSystem, IEcsDest
             }
 
             businessViewReferenceComponent.View.Slider.value = progress;
-            businessViewReferenceComponent.View.LevelUpButton.interactable = currency.CurrentBalance >= (businessConfigReference.BaseCost * (businessLevel + 1));
         }
 
         foreach (var entity in _businessUpgradeButtonViewReferenceFilter)
         {
             ref var businessUpgradeButtonViewReferenceComponent = ref _businessUpgradeButtonViewReferencePool.Get(entity);
-            businessUpgradeButtonViewReferenceComponent.View.UpgradeButton.interactable = currency.CurrentBalance >= businessUpgradeButtonViewReferenceComponent.Price;
+            var ownerEntity = _ownerPool.Get(entity).Entity;
+            ref var upgrades = ref _businessUpgradesPool.Get(ownerEntity);
+            var businessUpgradeButtonDataComponent = _businessUpgradeButtonDataPool.Get(entity);
+            var isBought = upgrades.HasUpgrade(businessUpgradeButtonDataComponent.UpgradeIndex);
+
+            if (isBought)
+            {
+                continue;
+            }
+            
+            businessUpgradeButtonViewReferenceComponent.View.UpgradeButton.interactable = currency.CurrentBalance >= businessUpgradeButtonDataComponent.Price;
         }
     }
 
