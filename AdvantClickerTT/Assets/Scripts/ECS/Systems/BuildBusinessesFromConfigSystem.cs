@@ -3,76 +3,62 @@ using Leopotam.EcsLite;
 public sealed class BuildBusinessesFromConfigSystem : IEcsInitSystem
 {
     private const int FirstBusinessesID = 0;
-    
-    // private readonly UiRoot _uiRoot;
-
-    // public BuildBusinessesFromConfigSystem(UiRoot uiRoot)
-    // {
-    //     _uiRoot = uiRoot;
-    // }
 
     public void Init(IEcsSystems systems)
     {
         var world = systems.GetWorld();
         
-        var configFilter = world.Filter<ConfigReferenceComponent>().End();
-        var timeFilter = world.Filter<GameTimeComponent>().End();
+        var configReferenceFilter = world.Filter<ConfigReferenceComponent>().End();
+        var gameTimeFilter = world.Filter<GameTimeComponent>().End();
         
-        var globalConfigPool = world.GetPool<ConfigReferenceComponent>();
-        var timePool = world.GetPool<GameTimeComponent>();
+        var configReferencePool = world.GetPool<ConfigReferenceComponent>();
+        var gameTimePool = world.GetPool<GameTimeComponent>();
         
         var configEntity = -1;
-        foreach (var e in configFilter)
+        foreach (var e in configReferenceFilter)
         {
             configEntity = e;
             break;
         }
 
-        var globalConfig = globalConfigPool.Get(configEntity);
-        var gameCfg = globalConfig.GameConfig;
-        var nameCfg = globalConfig.NameConfig;
+        ref var configReferenceComponent = ref configReferencePool.Get(configEntity);
+        var gameConfig = configReferenceComponent.GameConfig;
+        var nameConfig = configReferenceComponent.NameConfig;
 
-        double now = 0;
-        foreach (var t in timeFilter)
+        float currentTime = 0;
+        foreach (var t in gameTimeFilter)
         {
-            now = timePool.Get(t).CurrentTime;
+            currentTime = gameTimePool.Get(t).CurrentTime;
             break;
         }
 
-        var businessConfigPool = world.GetPool<BusinessConfigReferenceComponent>();
-        var levelPool = world.GetPool<BusinessLevelComponent>();
-        var cyclePool = world.GetPool<IncomeCycleComponent>();
+        var businessConfigReferencePool = world.GetPool<BusinessConfigReferenceComponent>();
+        var businessLevelPool = world.GetPool<BusinessLevelComponent>();
+        var incomeCyclePool = world.GetPool<IncomeCycleComponent>();
         //var upMaskPool = world.GetPool<UpgradesMask>();
         //var upEffectPool = world.GetPool<UpgradesEffectCache>();
         
-        foreach (var b in gameCfg.Businesses)
+        foreach (var b in gameConfig.Businesses)
         {
             var e = world.NewEntity();
             
-            ref var configReferenceComponent = ref businessConfigPool.Add(e);
-            ref var level = ref levelPool.Add(e);
-            ref var productionCycle = ref cyclePool.Add(e);
+            ref var businessConfigReferenceComponent = ref businessConfigReferencePool.Add(e);
+            ref var level = ref businessLevelPool.Add(e);
+            ref var productionCycle = ref incomeCyclePool.Add(e);
             
-            configReferenceComponent.BusinessId = b.Id;
-            configReferenceComponent.BaseCost = b.BaseCost;
-            configReferenceComponent.BaseIncome = b.BaseIncome;
-            configReferenceComponent.BaseDelaySeconds = b.DelaySeconds;
+            businessConfigReferenceComponent.BusinessId = b.Id;
+            businessConfigReferenceComponent.BaseCost = b.BaseCost;
+            businessConfigReferenceComponent.BaseIncome = b.BaseIncome;
+            businessConfigReferenceComponent.BaseDelaySeconds = b.DelaySeconds;
 
             level.Level = (b.Id == FirstBusinessesID) ? 1u : 0u;
 
-            productionCycle.FullCycleTime = configReferenceComponent.BaseDelaySeconds;
-            productionCycle.CycleStartTime = now;
-            productionCycle.NextIncomeTime = now + configReferenceComponent.BaseDelaySeconds;
+            productionCycle.FullCycleTime = businessConfigReferenceComponent.BaseDelaySeconds;
+            productionCycle.CycleStartTime = currentTime;
+            productionCycle.NextIncomeTime = currentTime + businessConfigReferenceComponent.BaseDelaySeconds;
 
             // ref var mask = ref upMaskPool.Add(e);
             // mask.Bits = 0;
-            
-            // var row = _uiRoot.SpawnBusinessRow();
-            // row.Init(id.Value, nameCfg.GetBusinessName(id.Value), nameCfg.GetUpgradeName(id.Value, 1), nameCfg.GetUpgradeName(id.Value, 2));
-            // ref var view = ref viewPool.Add(e);
-            // view.View = row;
-
-            // world.GetPool<RecomputeEconomyEvent>().Add(world.NewEntity());
         }
     }
 }

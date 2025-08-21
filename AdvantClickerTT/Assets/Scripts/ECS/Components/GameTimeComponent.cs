@@ -1,4 +1,4 @@
 public struct GameTimeComponent
 {
-    public double CurrentTime;
+    public float CurrentTime;
 }

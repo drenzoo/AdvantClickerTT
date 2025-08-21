@@ -246,7 +246,7 @@ GameObject:
   - component: {fileID: 8477744100070372544}
   - component: {fileID: 5248338600453029436}
   m_Layer: 5
-  m_Name: BusinessesGradeUpButton
+  m_Name: BusinessesUpgradeButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

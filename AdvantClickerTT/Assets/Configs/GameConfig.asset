@@ -17,49 +17,44 @@ MonoBehaviour:
     _delaySeconds: 3
     _baseCost: 3
     _baseIncome: 3
-    _upgrade1:
-      _price: 50
-      _multiplier: 1.5
-    _upgrade2:
-      _price: 400
-      _multiplier: 2
+    _businessUpgradeConfig:
+    - _price: 50
+      _multiplier: 0.5
+    - _price: 400
+      _multiplier: 1
   - _id: 1
     _delaySeconds: 6
     _baseCost: 40
     _baseIncome: 40
-    _upgrade1:
-      _price: 1200
+    _businessUpgradeConfig:
+    - _price: 1200
+      _multiplier: 1
+    - _price: 4000
       _multiplier: 2
-    _upgrade2:
-      _price: 4000
-      _multiplier: 3
   - _id: 2
     _delaySeconds: 10
     _baseCost: 200
     _baseIncome: 200
-    _upgrade1:
-      _price: 6000
-      _multiplier: 2
-    _upgrade2:
-      _price: 20000
-      _multiplier: 2.5
+    _businessUpgradeConfig:
+    - _price: 6000
+      _multiplier: 1
+    - _price: 20000
+      _multiplier: 1.5
   - _id: 3
     _delaySeconds: 17
     _baseCost: 1000
     _baseIncome: 1000
-    _upgrade1:
-      _price: 15000
+    _businessUpgradeConfig:
+    - _price: 15000
+      _multiplier: 1
+    - _price: 50000
       _multiplier: 2
-    _upgrade2:
-      _price: 50000
-      _multiplier: 3
   - _id: 4
     _delaySeconds: 30
     _baseCost: 5000
     _baseIncome: 5000
-    _upgrade1:
-      _price: 100000
-      _multiplier: 3
-    _upgrade2:
-      _price: 500000
-      _multiplier: 5
+    _businessUpgradeConfig:
+    - _price: 100000
+      _multiplier: 2
+    - _price: 500000
+      _multiplier: 4

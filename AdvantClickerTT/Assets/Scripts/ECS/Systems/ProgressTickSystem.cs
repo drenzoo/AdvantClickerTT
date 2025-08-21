@@ -68,7 +68,7 @@ public sealed class ProgressTickSystem : IEcsRunSystem
             
             UnityEngine.Debug.LogError($"{balance.CurrentBalance}");
 
-            double shift = cyclesCompleted * delay;
+            var shift = cyclesCompleted * delay;
             cycle.CycleStartTime += shift;
             cycle.NextIncomeTime += shift;
         }

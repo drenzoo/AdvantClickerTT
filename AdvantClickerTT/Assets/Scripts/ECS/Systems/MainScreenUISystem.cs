@@ -33,7 +33,7 @@ public sealed class MainScreenUISystem : IEcsInitSystem, IEcsRunSystem, IEcsDest
         mainScreenViewReferenceComponent.MainScreenViewReference = view;
 
         _mainViewFilter = _world.Filter<MainScreenViewReferenceComponent>().End();
-        _currencyFilter   = _world.Filter<PlayerCurrencyComponent>().End();
+        _currencyFilter = _world.Filter<PlayerCurrencyComponent>().End();
     }
 
     public void Run(IEcsSystems systems)
@@ -41,9 +41,10 @@ public sealed class MainScreenUISystem : IEcsInitSystem, IEcsRunSystem, IEcsDest
         var currencyEntity = -1;
         foreach (var e in _currencyFilter)
         {
-            currencyEntity = e; break;
+            currencyEntity = e;
+            break;
         }
-        
+
         ref var currency = ref _currencyPool.Get(currencyEntity);
 
         foreach (var e in _mainViewFilter)

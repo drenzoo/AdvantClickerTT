@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: UIResourceConfig
   m_EditorClassIdentifier: 
   _businessViewPrefab: {fileID: 3440649660581902418, guid: d55e82369900ab645a3d3cd6cc4a6fd4, type: 3}
-  _gradeButtonViewPrefab: {fileID: 5248338600453029436, guid: 2244c84e593fe5b429cfd4a5471cb049, type: 3}
+  _upgradeButtonViewPrefab: {fileID: 5248338600453029436, guid: 2244c84e593fe5b429cfd4a5471cb049, type: 3}
   _mainScreenViewPrefab: {fileID: 4756899538280338276, guid: e8a99370687a5ac4ba2982af232d72cb, type: 3}

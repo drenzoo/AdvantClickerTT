@@ -1,6 +1,6 @@
 public struct IncomeCycleComponent
 {
-    public double CycleStartTime;
-    public double NextIncomeTime;
+    public float CycleStartTime;
+    public float NextIncomeTime;
     public float FullCycleTime;
 }

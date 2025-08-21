@@ -3,11 +3,14 @@ using UnityEngine;
 [RequireComponent(typeof(RectTransform))]
 public class SafeAreaHelper : MonoBehaviour
 {
-    [SerializeField] private Canvas _canvas;
     [SerializeField] private RectTransform _safeAreaTransform;
+    
+    private Canvas _canvas;
     
     private void OnEnable()
     {
+        _canvas = _safeAreaTransform.root.GetComponent<Canvas>();
+        
         ApplySafeArea();
     }
     
@@ -15,7 +18,6 @@ public class SafeAreaHelper : MonoBehaviour
     private void OnValidate()
     {
         _safeAreaTransform = this.GetComponent<RectTransform>();
-        _canvas = _safeAreaTransform.root.GetComponent<Canvas>();
     }
 #endif
     

@@ -29,6 +29,7 @@ public sealed class EcsStartup : MonoBehaviour
                 .Add(new ProgressTickSystem())
             
                 .Add(new MainScreenUISystem(_uiResourcesConfig, _uiRoot, _moneyFormatter))
+                .Add(new BusinessesUISystem(_uiResourcesConfig, _moneyFormatter))
             ;
         
         _systems.Init();
