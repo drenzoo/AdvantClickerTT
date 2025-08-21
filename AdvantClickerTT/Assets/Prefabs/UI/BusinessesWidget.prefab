@@ -225,6 +225,7 @@ MonoBehaviour:
   _headerText: {fileID: 4986006663388290262}
   _levelText: {fileID: 7685521034518055973}
   _incomeText: {fileID: 6695809404775180109}
+  _buttontext: {fileID: 8851945225390291558}
   _levelUpButton: {fileID: 3067061012765703313}
   _unlocksLayer: {fileID: 3423011084711292078}
 --- !u!1 &3822317274215549223
@@ -732,7 +733,7 @@ GameObject:
   - component: {fileID: 1676926326244903936}
   - component: {fileID: 8851945225390291558}
   m_Layer: 5
-  m_Name: Label
+  m_Name: ButtonLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

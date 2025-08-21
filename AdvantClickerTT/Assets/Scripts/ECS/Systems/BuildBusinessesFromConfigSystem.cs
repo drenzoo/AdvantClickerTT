@@ -38,24 +38,24 @@ public sealed class BuildBusinessesFromConfigSystem : IEcsInitSystem
         //var upMaskPool = world.GetPool<UpgradesMask>();
         //var upEffectPool = world.GetPool<UpgradesEffectCache>();
         
-        foreach (var b in gameConfig.Businesses)
+        foreach (var businessConfig in gameConfig.Businesses)
         {
-            var e = world.NewEntity();
+            var entity = world.NewEntity();
             
-            ref var businessConfigReferenceComponent = ref businessConfigReferencePool.Add(e);
-            ref var level = ref businessLevelPool.Add(e);
-            ref var productionCycle = ref incomeCyclePool.Add(e);
+            ref var businessConfigReferenceComponent = ref businessConfigReferencePool.Add(entity);
+            ref var levelComponent = ref businessLevelPool.Add(entity);
+            ref var incomeCycleComponent = ref incomeCyclePool.Add(entity);
             
-            businessConfigReferenceComponent.BusinessId = b.Id;
-            businessConfigReferenceComponent.BaseCost = b.BaseCost;
-            businessConfigReferenceComponent.BaseIncome = b.BaseIncome;
-            businessConfigReferenceComponent.BaseDelaySeconds = b.DelaySeconds;
+            businessConfigReferenceComponent.BusinessId = businessConfig.Id;
+            businessConfigReferenceComponent.BaseCost = businessConfig.BaseCost;
+            businessConfigReferenceComponent.BaseIncome = businessConfig.BaseIncome;
+            businessConfigReferenceComponent.BaseDelaySeconds = businessConfig.DelaySeconds;
 
-            level.Level = (b.Id == FirstBusinessesID) ? 1u : 0u;
+            levelComponent.Level = (businessConfig.Id == FirstBusinessesID) ? 1u : 0u;
 
-            productionCycle.FullCycleTime = businessConfigReferenceComponent.BaseDelaySeconds;
-            productionCycle.CycleStartTime = currentTime;
-            productionCycle.NextIncomeTime = currentTime + businessConfigReferenceComponent.BaseDelaySeconds;
+            incomeCycleComponent.FullCycleTime = businessConfigReferenceComponent.BaseDelaySeconds;
+            incomeCycleComponent.CycleStartTime = currentTime;
+            incomeCycleComponent.NextIncomeTime = currentTime + businessConfigReferenceComponent.BaseDelaySeconds;
 
             // ref var mask = ref upMaskPool.Add(e);
             // mask.Bits = 0;
