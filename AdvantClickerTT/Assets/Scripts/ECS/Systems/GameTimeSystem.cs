@@ -2,20 +2,29 @@ using Leopotam.EcsLite;
 
 public sealed class GameTimeSystem : IEcsInitSystem, IEcsRunSystem
 {
-    private int _timeEntity;
+    private EcsFilter _timeFilter;
+    private EcsPool<GameTimeComponent> _timePool;
 
     public void Init(IEcsSystems systems)
     {
         var world = systems.GetWorld();
-        _timeEntity = world.NewEntity();
-        ref var gameTimeComponent = ref world.GetPool<GameTimeComponent>().Add(_timeEntity);
-        gameTimeComponent.CurrentTime = UnityEngine.Time.timeAsDouble; // 0?
+        var timeEntity = world.NewEntity();
+        
+        _timePool = world.GetPool<GameTimeComponent>();
+        
+        ref var gameTime = ref _timePool.Add(timeEntity);
+        gameTime.CurrentTime = 0f;
+        
+        _timeFilter = world.Filter<GameTimeComponent>().End();
     }
 
     public void Run(IEcsSystems systems)
     {
-        var world = systems.GetWorld();
-        ref var gameTimeComponent = ref world.GetPool<GameTimeComponent>().Get(_timeEntity);
-        gameTimeComponent.CurrentTime = UnityEngine.Time.timeAsDouble;
+        foreach (var entity in _timeFilter)
+        {
+            ref var gameTime = ref _timePool.Get(entity);
+
+            gameTime.CurrentTime = UnityEngine.Time.timeAsDouble;
+        }
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NameConfig", menuName = "Configs/Name Config")]
+[CreateAssetMenu(fileName = "NameConfig", menuName = "Configs/Game/Name Config")]
 public sealed class NameConfig : ScriptableObject
 {
     [SerializeField] private BusinessName[] _businesses;
